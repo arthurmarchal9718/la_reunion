@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réunion en ligne</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 80%;
+        }
+
+        input, button, select {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .planning {
+            text-align: left;
+            width: 80%;
+            margin: 20px auto;
+            border-top: 2px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .meeting-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .meeting-item button {
+            background-color: #28a745;
+        }
+
+        .meeting-item button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Création de la réunion -->
+    <div class="container">
+        <h1>Créer une réunion</h1>
+        <input type="text" id="meetingTitle" placeholder="Titre de la réunion" />
+        <input type="datetime-local" id="meetingTime" />
+        <button onclick="createMeeting()">Planifier la réunion</button>
+    </div>
+
+    <!-- Planning des réunions -->
+    <div class="planning">
+        <h2>Planning des réunions</h2>
+        <div id="meetingsList"></div>
+    </div>
+
+    <script>
+        // Fonction pour générer un lien unique de réunion
+        function generateMeetingLink() {
+            const randomString = Math.random().toString(36).substring(2, 10);  // Génère une chaîne aléatoire
+            return `https://meetingplatform.com/${randomString}`;
+        }
+
+        // Fonction pour enregistrer une réunion dans localStorage
+        function createMeeting() {
+            const title = document.getElementById("meetingTitle").value;
+            const time = document.getElementById("meetingTime").value;
+
+            if (title && time) {
+                const meetingLink = generateMeetingLink();  // Génère un lien unique pour la réunion
+                let meetings = JSON.parse(localStorage.getItem("meetings")) || [];
+                meetings.push({ title, link: meetingLink, time });
+                localStorage.setItem("meetings", JSON.stringify(meetings));
+                renderMeetings();
+                clearForm();
+            } else {
+                alert("Veuillez remplir tous les champs.");
+            }
+        }
+
+        // Fonction pour afficher les réunions
+        function renderMeetings() {
+            const meetingsList = document.getElementById("meetingsList");
+            meetingsList.innerHTML = "";
+
+            let meetings = JSON.parse(localStorage.getItem("meetings")) || [];
+
+            meetings.forEach((meeting, index) => {
+                const meetingItem = document.createElement("div");
+                meetingItem.classList.add("meeting-item");
+
+                meetingItem.innerHTML = `
+                    <strong>${meeting.title}</strong><br>
+                    <span>${meeting.time}</span><br>
+                    <a href="${meeting.link}" target="_blank">Rejoindre la réunion</a>
+                `;
+
+                meetingsList.appendChild(meetingItem);
+            });
+        }
+
+        // Fonction pour vider le formulaire
+        function clearForm() {
+            document.getElementById("meetingTitle").value = "";
+            document.getElementById("meetingTime").value = "";
+        }
+
+        // Appel initial pour charger les réunions existantes
+        renderMeetings();
+    </script>
+</body>
+</html>
